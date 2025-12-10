@@ -228,7 +228,7 @@ section {
 }
 
 .mission-section {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, var(--primary), var(--primary));
     color: white;
     padding: 6rem 0;
     text-align: center;
@@ -237,7 +237,7 @@ section {
 
 .mission-section h2,
 .mission-section h3 {
-    color: white;
+    color: #27ae60;;
 }
 
 .mission-section p,
@@ -385,6 +385,19 @@ h4 {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2.5rem;
     margin-top: 3rem;
+}
+
+.products-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.experts-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.products-grid .product-card:nth-child(4),
+.experts-grid .expert-card:nth-child(4) {
+    grid-column: 2;
 }
 
 .solution-card,
