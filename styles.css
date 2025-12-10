@@ -932,6 +932,11 @@ h4 {
         gap: 1.5rem;
     }
 
+    .products-grid .product-card:nth-child(4),
+    .experts-grid .expert-card:nth-child(4) {
+        grid-column: 1;
+    }
+
     .solution-card,
     .product-card,
     .impact-card,
