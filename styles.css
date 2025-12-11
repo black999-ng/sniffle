@@ -114,6 +114,25 @@ header.sticky-header.scrolled {
     background: var(--accent);
 }
 
+.main-nav ul li a.cta-donate {
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+    border: 2px solid var(--accent);
+    margin: 0.5rem 0;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    letter-spacing: 0.5px;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.main-nav ul li a.cta-donate:hover {
+    background: transparent;
+    color: white;
+    transform: translateY(-2px);
+}
+
 .mobile-menu-toggle {
     display: none;
     flex-direction: column;
@@ -137,15 +156,18 @@ header.sticky-header.scrolled {
 }
 
 .mobile-menu-toggle.active span:nth-child(1) {
-    transform: rotate(45deg) translate(10px, 10px);
+    transform: rotate(45deg) translate(6px, 7px);
+    background: var(--accent);
 }
 
 .mobile-menu-toggle.active span:nth-child(2) {
     opacity: 0;
+    transform: scaleX(0.5);
 }
 
 .mobile-menu-toggle.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -7px);
+    transform: rotate(-45deg) translate(6px, -7px);
+    background: var(--accent);
 }
 
 main {
@@ -773,6 +795,34 @@ h4 {
     margin-bottom: 0.5rem;
 }
 
+/* --- MOBILE NAV HEIGHT & BUTTON FIT FIX --- */
+.main-nav.active {
+    max-height: 100vh !important;
+    min-height: 100vh !important;
+    padding: 1.2rem 0.5rem 2.5rem 0.5rem !important;
+    overflow-y: auto !important;
+}
+.main-nav ul li a {
+    display: block;
+    padding: 0.9rem 0.7rem;
+    font-size: 0.98rem;
+    border-radius: 0;
+    background: transparent;
+    text-align: left;
+    width: 100%;
+    box-sizing: border-box;
+}
+.main-nav ul li a.cta-donate {
+    margin: 0.7rem 0 0.2rem 0;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    letter-spacing: 0.5px;
+    font-size: 1.05rem;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+/* --- END MOBILE NAV HEIGHT & BUTTON FIT FIX --- */
+
 /* =============================================
    ANIMATIONS & TRANSITIONS
    ============================================= */
@@ -836,8 +886,10 @@ h4 {
     }
 
     .main-nav.active {
-        max-height: 500px;
-        padding: 1.5rem;
+        max-height: 100vh !important;
+        min-height: 100vh !important;
+        padding: 1.2rem 0.5rem 2.5rem 0.5rem !important;
+        overflow-y: auto !important;
     }
 
     .main-nav ul {
@@ -859,11 +911,13 @@ h4 {
 
     .main-nav ul li a {
         display: block;
-        padding: 1rem;
-        font-size: 1.05rem;
+        padding: 0.85rem 0.7rem;
+        font-size: 0.98rem;
         border-radius: 0;
         background: transparent;
         text-align: left;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .main-nav ul li a:hover {

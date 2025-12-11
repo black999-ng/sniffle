@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonateNow - Secure Payment Gateway</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 640px) {
+            body {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Top Bar -->
+    <div class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="heart" class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-base sm:text-lg font-bold text-gray-900">DonateNow</h1>
+                        <p class="text-xs text-gray-500 hidden sm:block">Secure Payment Gateway</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600">
+                    <i data-lucide="shield" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600 flex-shrink-0"></i>
+                    <span class="hidden sm:inline">Secured by SSL</span>
+                    <span class="sm:hidden">Secure</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="bg-white border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+            <div id="progress-bar" class="flex items-center justify-between gap-1 sm:gap-2">
+                <!-- Progress steps will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 fade-in">
+            <div id="content-area" class="p-4 sm:p-6 lg:p-8">
+                <!-- Dynamic content will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Admin Section -->
+        <div id="admin-section" class="mt-6 bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6" style="display: none;">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
+                <div class="w-full sm:w-auto">
+                    <h3 class="text-base sm:text-lg font-bold text-gray-900">Donation Records</h3>
+                    <p id="donation-stats" class="text-xs sm:text-sm text-gray-600 mt-0.5"></p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                    <button onclick="clearAllDonations()" class="flex items-center justify-center gap-2 bg-red-600 text-white px-4 py-2 sm:py-2.5 rounded-lg font-semibold hover:bg-red-700 transition shadow-md text-sm w-full sm:w-auto">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Clear All</span>
+                    </button>
+                    <button onclick="exportToJSON()" class="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 sm:py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md text-sm w-full sm:w-auto">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Export JSON</span>
+                    </button>
+                </div>
+            </div>
+            <div id="donations-list" class="space-y-3 max-h-96 overflow-y-auto">
+                <!-- Donations will be listed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-white border-t border-gray-200 mt-8 sm:mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 text-center text-xs sm:text-sm text-gray-600">
+            <p>© 2024 DonateNow. All transactions are secured and encrypted.</p>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let state = {
+            step: 'amount',
+            donations: [],
+            isProcessing: false,
+            formData: {
+                name: '',
+                email: '',
+                phone: '',
+                amount: '',
+                customAmount: '',
+                message: '',
+                paymentMethod: '',
+                receipt: null
+            },
+            errors: {}
+        };
+
+        const presetAmounts = [1000, 2500, 5000, 10000, 25000, 50000];
+
+        // Utility functions
+        function formatAmount(amount) {
+            return new Intl.NumberFormat('en-NG', {
+                style: 'currency',
+                currency: 'NGN',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function validatePhone(phone) {
+            if (!phone) return true;
+            return /^\+?\d{10,15}$/.test(phone.replace(/\s/g, ''));
+        }
+
+        function validateAmount(amount) {
+            const num = Number(amount);
+            return num >= 100;
+        }
+
+        function validateForm() {
+            const errors = {};
+            const finalAmount = state.formData.customAmount || state.formData.amount;
+
+            if (!state.formData.name.trim()) {
+                errors.name = 'Name is required';
+            }
+
+            if (!state.formData.email.trim()) {
+                errors.email = 'Email is required';
+            } else if (!validateEmail(state.formData.email)) {
+                errors.email = 'Invalid email address';
+            }
+
+            if (state.formData.phone && !validatePhone(state.formData.phone)) {
+                errors.phone = 'Invalid phone number';
+            }
+
+            if (!finalAmount) {
+                errors.amount = 'Please select or enter an amount';
+            } else if (!validateAmount(finalAmount)) {
+                errors.amount = 'Minimum donation is ₦100';
+            }
+
+            state.errors = errors;
+            return Object.keys(errors).length === 0;
+        }
+
+        function updateProgressBar() {
+            const steps = [
+                { name: 'Amount', id: 'amount' },
+                { name: 'Payment', id: 'payment' },
+                { name: 'Verify', id: 'receipt' },
+                { name: 'Done', id: 'success' }
+            ];
+
+            let html = '';
+            steps.forEach((step, index) => {
+                const isActive = state.step === step.id || 
+                    (step.id === 'payment' && (state.step === 'receipt' || state.step === 'success')) ||
+                    (step.id === 'receipt' && state.step === 'success');
+                const isDone = step.id === 'success' && state.step === 'success';
+                
+                html += `
+                    <div class="flex items-center gap-1.5 sm:gap-2 ${isActive ? 'text-blue-600' : 'text-gray-400'} ${isDone ? 'text-green-600' : ''}">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-semibold text-xs sm:text-sm ${isActive || isDone ? (isDone ? 'bg-green-600' : 'bg-blue-600') + ' text-white' : 'bg-gray-200'} flex-shrink-0">
+                            ${isDone ? '✓' : index + 1}
+                        </div>
+                        <span class="text-xs sm:text-sm font-medium hidden sm:inline">${step.name}</span>
+                    </div>
+                `;
+                if (index < steps.length - 1) {
+                    html += '<div class="flex-1 h-0.5 bg-gray-200 mx-1 sm:mx-2 min-w-[8px]"></div>';
+                }
+            });
+            document.getElementById('progress-bar').innerHTML = html;
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        function renderAmountStep() {
+            return `
+                <div class="space-y-4 sm:space-y-6">
+                    <div class="mb-6 sm:mb-8">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">Select Donation Amount</h2>
+                        <p class="text-sm sm:text-base text-gray-600">Choose a preset amount or enter your own</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                        ${presetAmounts.map(amount => `
+                            <button onclick="selectAmount(${amount})" class="p-3 sm:p-5 rounded-lg border-2 font-semibold transition-all text-base sm:text-xl ${state.formData.amount === amount ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-md' : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'}">
+                                ${formatAmount(amount)}
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <div class="mb-6 sm:mb-8">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Custom Amount</label>
+                        <div class="relative">
+                            <span class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm sm:text-base">₦</span>
+                            <input 
+                                type="number" 
+                                id="customAmount" 
+                                value="${state.formData.customAmount}" 
+                                oninput="updateFormData('customAmount', this.value)" 
+                                min="100" 
+                                class="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 border text-sm sm:text-base ${state.errors.amount ? 'border-red-300 bg-red-50' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" 
+                                placeholder="Enter amount (min. ₦100)"
+                            >
+                        </div>
+                        ${state.errors.amount ? `<p class="text-red-600 text-xs sm:text-sm mt-1.5">${state.errors.amount}</p>` : ''}
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-6 sm:pt-8">
+                        <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-4 sm:mb-6">Donor Information</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Full Name <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    value="${state.formData.name}" 
+                                    oninput="updateFormData('name', this.value)" 
+                                    class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border text-sm sm:text-base ${state.errors.name ? 'border-red-300 bg-red-50' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" 
+                                    placeholder="Adebayo Johnson"
+                                >
+                                ${state.errors.name ? `<p class="text-red-600 text-xs sm:text-sm mt-1.5">${state.errors.name}</p>` : ''}
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Email Address <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    type="email" 
+                                    value="${state.formData.email}" 
+                                    oninput="updateFormData('email', this.value)" 
+                                    class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border text-sm sm:text-base ${state.errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" 
+                                    placeholder="adebayo@example.com"
+                                >
+                                ${state.errors.email ? `<p class="text-red-600 text-xs sm:text-sm mt-1.5">${state.errors.email}</p>` : ''}
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number (Optional)</label>
+                                <input 
+                                    type="tel" 
+                                    value="${state.formData.phone}" 
+                                    oninput="updateFormData('phone', this.value)" 
+                                    class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border text-sm sm:text-base ${state.errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" 
+                                    placeholder="+234 800 000 0000"
+                                >
+                                ${state.errors.phone ? `<p class="text-red-600 text-xs sm:text-sm mt-1.5">${state.errors.phone}</p>` : ''}
+                            </div>
+                        </div>
+
+                        <div class="mt-4 sm:mt-6">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Message (Optional)</label>
+                            <textarea 
+                                oninput="updateFormData('message', this.value)" 
+                                rows="3" 
+                                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none" 
+                                placeholder="Add a message of support..."
+                            >${state.formData.message}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                        <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
+                            <i data-lucide="lock" class="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0"></i>
+                            <span>Your information is secure</span>
+                        </div>
+                        <button onclick="proceedToPayment()" class="w-full sm:w-auto bg-blue-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base hover:bg-blue-700 transition shadow-lg hover:shadow-xl">
+                            Continue to Payment
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPaymentStep() {
+            const finalAmount = state.formData.customAmount || state.formData.amount;
+            return `
+                <div class="space-y-4 sm:space-y-6">
+                    <button onclick="goToStep('amount')" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition mb-4 sm:mb-6 text-sm sm:text-base">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        Back to donation details
+                    </button>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+                            <div>
+                                <p class="text-xs sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Donation Amount</p>
+                                <p class="text-xl sm:text-2xl font-bold text-gray-900">${formatAmount(finalAmount)}</p>
+                            </div>
+                            <div class="text-left sm:text-right">
+                                <p class="text-xs sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Donor</p>
+                                <p class="font-semibold text-gray-900 text-sm sm:text-base">${state.formData.name}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">Choose Payment Method</h2>
+                    <p class="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">Select your preferred payment gateway</p>
+
+                    ${state.isProcessing ? `
+                        <div class="text-center py-12 sm:py-16">
+                            <div class="inline-block w-12 h-12 sm:w-16 sm:h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3 sm:mb-4"></div>
+                            <p class="text-gray-600 font-medium text-sm sm:text-base">Connecting to payment gateway...</p>
+                        </div>
+                    ` : `
+                        <div class="space-y-3 sm:space-y-4">
+                            <button onclick="selectPaymentMethod('Paystack')" class="w-full card-hover border-2 border-gray-200 hover:border-blue-500 rounded-lg sm:rounded-xl p-4 sm:p-6 text-left transition-all">
+                                <div class="flex items-center gap-3 sm:gap-4">
+                                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0">
+                                        <i data-lucide="credit-card" class="w-6 h-6 sm:w-8 sm:h-8 text-white"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="font-bold text-gray-900 text-base sm:text-xl mb-0.5 sm:mb-1">Paystack</h3>
+                                        <p class="text-xs sm:text-sm text-gray-600">Debit Card • Bank Transfer • USSD</p>
+                                        <p class="text-xs text-gray-500 mt-0.5 sm:mt-1">Most popular • Instant confirmation</p>
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button onclick="selectPaymentMethod('Flutterwave')" class="w-full card-hover border-2 border-gray-200 hover:border-orange-500 rounded-lg sm:rounded-xl p-4 sm:p-6 text-left transition-all">
+                                <div class="flex items-center gap-3 sm:gap-4">
+                                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0">
+                                        <i data-lucide="credit-card" class="w-6 h-6 sm:w-8 sm:h-8 text-white"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="font-bold text-gray-900 text-base sm:text-xl mb-0.5 sm:mb-1">Flutterwave</h3>
+                                        <p class="text-xs sm:text-sm text-gray-600">Debit Card • Bank Transfer • Mobile Money</p>
+                                        <p class="text-xs text-gray-500 mt-0.5 sm:mt-1">Secure • Multiple options</p>
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button onclick="selectPaymentMethod('Remita')" class="w-full card-hover border-2 border-gray-200 hover:border-purple-500 rounded-lg sm:rounded-xl p-4 sm:p-6 text-left transition-all">
+                                <div class="flex items-center gap-3 sm:gap-4">
+                                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0">
+                                        <i data-lucide="credit-card" class="w-6 h-6 sm:w-8 sm:h-8 text-white"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="font-bold text-gray-900 text-base sm:text-xl mb-0.5 sm:mb-1">Remita</h3>
+                                        <p class="text-xs sm:text-sm text-gray-600">Direct Debit • Bank Transfer</p>
+                                        <p class="text-xs text-gray-500 mt-0.5 sm:mt-1">Government approved • Trusted</p>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+
+                        <div class="mt-6 sm:mt-8 flex items-start gap-2 text-xs sm:text-sm text-gray-500 bg-gray-50 p-3 sm:p-4 rounded-lg">
+                            <i data-lucide="info" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>
+                            <p>All payment methods are secured with industry-standard encryption</p>
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function renderReceiptStep() {
+            const finalAmount = state.formData.customAmount || state.formData.amount;
+            return `
+                <div class="space-y-4 sm:space-y-6">
+                    <button onclick="goToStep('payment')" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition mb-4 sm:mb-6 text-sm sm:text-base">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        Back to payment methods
+                    </button>
+
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-3.5 sm:p-5 mb-6 sm:mb-8">
+                        <div class="flex items-start gap-2.5 sm:gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 sm:w-6 sm:h-6 text-green-600 flex-shrink-0 mt-0.5"></i>
+                            <div>
+                                <p class="font-semibold text-green-900 mb-0.5 sm:mb-1 text-sm sm:text-base">Payment Gateway Connected</p>
+                                <p class="text-xs sm:text-sm text-green-800">You've selected <span class="font-semibold">${state.formData.paymentMethod}</span> for ${formatAmount(finalAmount)}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">Upload Payment Confirmation</h2>
+                    <p class="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">Please upload a screenshot or receipt of your successful payment</p>
+
+                    ${state.formData.receipt ? `
+                        <div class="border-2 border-green-300 bg-green-50 rounded-lg sm:rounded-xl p-4 sm:p-6">
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i data-lucide="file-check" class="w-6 h-6 sm:w-8 sm:h-8 text-green-600"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="font-semibold text-gray-900 text-sm sm:text-base truncate">${state.formData.receipt.name}</p>
+                                        <p class="text-xs sm:text-sm text-gray-600">${(state.formData.receipt.size / 1024).toFixed(2)} KB</p>
+                                    </div>
+                                </div>
+                                <button onclick="removeReceipt()" class="text-red-600 hover:text-red-700 font-semibold flex-shrink-0">
+                                    <i data-lucide="x" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                                </button>
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl p-8 sm:p-12 text-center hover:border-blue-400 hover:bg-blue-50 transition-all">
+                            <input type="file" accept="image/*,.pdf" onchange="handleFileUpload(event)" class="hidden" id="receipt-upload">
+                            <label for="receipt-upload" class="cursor-pointer">
+                                <div class="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-blue-100 rounded-full mb-3 sm:mb-4">
+                                    <i data-lucide="upload" class="w-8 h-8 sm:w-10 sm:h-10 text-blue-600"></i>
+                                </div>
+                                <p class="text-base sm:text-lg text-gray-700 mb-1.5 sm:mb-2 font-semibold">Click to upload your receipt</p>
+                                <p class="text-xs sm:text-sm text-gray-500">Supported formats: PNG, JPG, PDF (Max 10MB)</p>
+                            </label>
+                        </div>
+                    `}
+
+                    <div class="mt-6 sm:mt-8 bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4">
+                        <p class="text-xs sm:text-sm text-gray-700 font-medium mb-1.5 sm:mb-2">Important:</p>
+                        <ul class="text-xs sm:text-sm text-gray-600 space-y-1 list-disc list-inside">
+                            <li>Ensure the payment amount matches your donation</li>
+                            <li>Screenshot should clearly show transaction details</li>
+                            <li>Your donation will be verified within 24 hours</li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-6 sm:mt-8 flex justify-end">
+                        <button onclick="handleSubmit()" ${!state.formData.receipt ? 'disabled' : ''} class="w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold transition shadow-lg text-sm sm:text-base ${state.formData.receipt ? 'bg-green-600 text-white hover:bg-green-700 hover:shadow-xl' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}">
+                            Complete Donation
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSuccessStep() {
+            const finalAmount = state.formData.customAmount || state.formData.amount;
+            const referenceId = `DN-${Date.now().toString().slice(-8)}`;
+            return `
+                <div class="p-6 sm:p-12 text-center">
+                    <div class="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 bg-green-100 rounded-full mb-4 sm:mb-6">
+                        <i data-lucide="check-circle" class="w-12 h-12 sm:w-14 sm:h-14 text-green-600"></i>
+                    </div>
+                    <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">Donation Submitted Successfully!</h3>
+                    <p class="text-base sm:text-lg text-gray-600 mb-6">Thank you for your generous contribution</p>
+                    <div class="bg-gray-50 rounded-lg p-4 sm:p-6 max-w-md mx-auto mb-6 sm:mb-8">
+                        <div class="space-y-2.5 sm:space-y-3">
+                            <div class="flex justify-between items-start text-sm">
+                                <span class="text-gray-600">Amount</span>
+                                <span class="font-bold text-gray-900 text-lg sm:text-xl">${formatAmount(finalAmount)}</span>
+                            </div>
+                            <div class="flex justify-between items-start text-sm">
+                                <span class="text-gray-600">Payment Method</span>
+                                <span class="font-semibold text-gray-900 text-right">${state.formData.paymentMethod}</span>
+                            </div>
+                            <div class="flex justify-between items-start text-sm">
+                                <span class="text-gray-600">Reference ID</span>
+                                <span class="font-mono text-gray-900 text-right break-all">${referenceId}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-500 mb-1.5 sm:mb-2">A confirmation email has been sent to</p>
+                    <p class="text-xs sm:text-sm font-semibold text-gray-700 mb-6 sm:mb-8 break-words">${state.formData.email}</p>
+                    <div class="flex justify-center">
+                        <button onclick="makeAnotherDonation()" class="w-full sm:w-auto bg-blue-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg hover:shadow-xl text-sm sm:text-base">
+                            Make Another Donation
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function render() {
+            let content = '';
+            switch(state.step) {
+                case 'amount':
+                    content = renderAmountStep();
+                    break;
+                case 'payment':
+                    content = renderPaymentStep();
+                    break;
+                case 'receipt':
+                    content = renderReceiptStep();
+                    break;
+                case 'success':
+                    content = renderSuccessStep();
+                    break;
+            }
+            
+            document.getElementById('content-area').innerHTML = content;
+            updateProgressBar();
+            
+            if (state.donations.length > 0) {
+                document.getElementById('admin-section').style.display = 'block';
+                updateAdminSection();
+            } else {
+                document.getElementById('admin-section').style.display = 'none';
+            }
+        }
+
+        function updateAdminSection() {
+            const totalAmount = state.donations.reduce((sum, d) => sum + Number(d.amount), 0);
+            document.getElementById('donation-stats').textContent = `${state.donations.length} total donations • ${formatAmount(totalAmount)} raised`;
+            
+            const donationsHTML = state.donations.map(donation => `
+                <div class="border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-sm transition">
+                    <div class="flex justify-between items-start mb-2 sm:mb-3 gap-3">
+                        <div class="min-w-0 flex-1">
+                            <p class="font-semibold text-gray-900 text-sm sm:text-lg truncate">${donation.name}</p>
+                            <p class="text-xs sm:text-sm text-gray-600 truncate">${donation.email}</p>
+                        </div>
+                        <p class="text-base sm:text-xl font-bold text-blue-600 flex-shrink-0">${formatAmount(donation.amount)}</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full font-medium">
+                            ${donation.paymentMethod}
+                        </span>
+                        <span class="text-xs text-gray-500">
+                            ${new Date(donation.timestamp).toLocaleString('en-NG')}
+                        </span>
+                    </div>
+                    ${donation.message ? `<p class="text-xs sm:text-sm text-gray-600 italic border-l-2 border-gray-200 pl-2 sm:pl-3 mt-2">"${donation.message}"</p>` : ''}
+                </div>
+            `).join('');
+            
+            document.getElementById('donations-list').innerHTML = donationsHTML || '<p class="text-gray-500 text-center py-8 text-sm">No donations yet</p>';
+        }
+
+        // Event handlers
+        function updateFormData(field, value) {
+            state.formData[field] = value;
+            if (field === 'customAmount') {
+                state.formData.amount = '';
+            }
+            if (state.errors[field]) {
+                delete state.errors[field];
+            }
+            if (field === 'email' && value && !validateEmail(value)) {
+                state.errors.email = 'Invalid email address';
+            }
+            if (field === 'phone' && value && !validatePhone(value)) {
+                state.errors.phone = 'Invalid phone number';
+            }
+            if (field === 'customAmount' && value && !validateAmount(value)) {
+                state.errors.amount = 'Minimum donation is ₦100';
+            }
+        }
+
+        function selectAmount(amount) {
+            state.formData.amount = amount;
+            state.formData.customAmount = '';
+            delete state.errors.amount;
+            render();
+        }
+
+        function goToStep(step) {
+            state.step = step;
+            render();
+        }
+
+        function proceedToPayment() {
+            if (!validateForm()) {
+                render();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+            state.step = 'payment';
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function selectPaymentMethod(method) {
+            state.formData.paymentMethod = method;
+            state.isProcessing = true;
+            render();
+            setTimeout(() => {
+                state.isProcessing = false;
+                state.step = 'receipt';
+                render();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 2500);
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size exceeds 10MB. Please choose a smaller file.');
+                    return;
+                }
+                const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Invalid file type. Please upload PNG, JPG, or PDF files only.');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    state.formData.receipt = {
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        data: reader.result
+                    };
+                    render();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeReceipt() {
+            state.formData.receipt = null;
+            render();
+        }
+
+        function handleSubmit() {
+            if (!state.formData.receipt) {
+                alert('Please upload your payment receipt');
+                return;
+            }
+            
+            const donation = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                name: state.formData.name,
+                email: state.formData.email,
+                phone: state.formData.phone,
+                amount: state.formData.customAmount || state.formData.amount,
+                message: state.formData.message,
+                paymentMethod: state.formData.paymentMethod,
+                receipt: state.formData.receipt
+            };
+            
+            state.donations.push(donation);
+            state.step = 'success';
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function makeAnotherDonation() {
+            state.formData = {
+                name: '',
+                email: '',
+                phone: '',
+                amount: '',
+                customAmount: '',
+                message: '',
+                paymentMethod: '',
+                receipt: null
+            };
+            state.errors = {};
+            state.step = 'amount';
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function clearAllDonations() {
+            if (confirm('Are you sure you want to clear all donation records? This action cannot be undone.')) {
+                state.donations = [];
+                render();
+            }
+        }
+
+        function exportToJSON() {
+            if (state.donations.length === 0) {
+                alert('No donations to export');
+                return;
+            }
+            const dataStr = JSON.stringify(state.donations, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `donations_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize
+        render();
+    </script>
+</body>
+</html>

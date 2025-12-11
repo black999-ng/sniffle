@@ -11,23 +11,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
-            e.preventDefault();
             const targetId = link.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
-
-            if (targetSection) {
-                targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                
-                // Close mobile menu if open
-                const mobileNav = document.querySelector('.main-nav');
-                const mobileToggle = document.getElementById('mobileMenuToggle');
-                if (mobileNav && mobileNav.classList.contains('active')) {
-                    mobileNav.classList.remove('active');
-                    if (mobileToggle) {
-                        mobileToggle.classList.remove('active');
+            // Only intercept internal anchor links (start with #)
+            if (targetId && targetId.startsWith('#')) {
+                e.preventDefault();
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // Close mobile menu if open
+                    const mobileNav = document.querySelector('.main-nav');
+                    const mobileToggle = document.getElementById('mobileMenuToggle');
+                    if (mobileNav && mobileNav.classList.contains('active')) {
+                        mobileNav.classList.remove('active');
+                        if (mobileToggle) {
+                            mobileToggle.classList.remove('active');
+                        }
                     }
                 }
             }
+            // Otherwise, let browser handle navigation (for donation.html etc)
         });
     });
 
